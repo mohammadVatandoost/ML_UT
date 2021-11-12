@@ -33,20 +33,20 @@ if __name__ == '__main__':
     chelsea, manchester = getDataset("./Images")
     chelsea_avg_color = 0
     manchester_avg_color = 0
-    sum = 0
-    for image in chelsea:
-        img = io.imread('./Images/'+image)
-        avg_color_per_row = np.average(img, axis=0)
-        avg_color = np.average(avg_color_per_row, axis=0)
-        sum = sum + avg_color[2]
-    chelsea_avg_color = sum / len(chelsea)
-    sum = 0
-    for image in manchester:
-        img = io.imread('./Images/'+image)[:, :, :-1]
-        avg_color_per_row = np.average(img, axis=0)
-        avg_color = np.average(avg_color_per_row, axis=0)
-        sum = sum + avg_color[0]
-    manchester_avg_color = sum / len(manchester)
+    # sum = 0
+    # for image in chelsea:
+    #     img = io.imread('./Images/'+image)
+    #     avg_color_per_row = np.average(img, axis=0)
+    #     avg_color = np.average(avg_color_per_row, axis=0)
+    #     sum = sum + avg_color[2]
+    # chelsea_avg_color = sum / len(chelsea)
+    # sum = 0
+    # for image in manchester:
+    #     img = io.imread('./Images/'+image)[:, :, :-1]
+    #     avg_color_per_row = np.average(img, axis=0)
+    #     avg_color = np.average(avg_color_per_row, axis=0)
+    #     sum = sum + avg_color[0]
+    # manchester_avg_color = sum / len(manchester)
 
     # test data
     TChelsea = 0
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         img = io.imread('./Images/'+image)
         avg_color_per_row = np.average(img, axis=0)
         avg_color = np.average(avg_color_per_row, axis=0)
-        if avg_color[2] >= chelsea_avg_color:
+        if avg_color[2] >= avg_color[0]:
             TChelsea = TChelsea + 1
         else:
             FManchester = FManchester + 1
@@ -66,18 +66,17 @@ if __name__ == '__main__':
         img = io.imread('./Images/'+image)
         avg_color_per_row = np.average(img, axis=0)
         avg_color = np.average(avg_color_per_row, axis=0)
-        if avg_color[0] >= manchester_avg_color:
+        if avg_color[0] >= avg_color[2]:
             TManchester = TManchester + 1
         else:
             FChelsea = FChelsea + 1
 
-    print("chelsea_avg_color:{0}".format(chelsea_avg_color))
-    print("manchester_avg_color:{0}".format(manchester_avg_color))
     print("TChelsea:{0}".format(TChelsea))
     print("FChelsea:{0}".format(FChelsea))
     print("TManchester:{0}".format(TManchester))
     print("FManchester:{0}".format(FManchester))
-
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    print("Manchester Precision:{0}".format(TManchester / (TManchester + FManchester)))
+    print("Chelsea Precision:{0}".format(TChelsea / (TChelsea + FChelsea)))
+    print("Manchester Recall:{0}".format(TManchester / (TManchester + FChelsea)))
+    print("Chelsea Recall:{0}".format(TChelsea / (TChelsea + FManchester)))
+    print("Accuracy:{0}".format( (TChelsea+TManchester)/(TManchester+TChelsea+FChelsea+FManchester)))

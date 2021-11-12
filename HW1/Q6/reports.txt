@@ -1,0 +1,12 @@
+TChelsea:46
+FChelsea:1
+TManchester:56
+FManchester:18
+Manchester Precision:0.7567567567567568
+Chelsea Precision:0.9787234042553191
+Manchester Recall:0.9824561403508771
+Chelsea Recall:0.71875
+Accuracy:0.8429752066115702
+
+
+
