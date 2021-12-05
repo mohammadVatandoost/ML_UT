@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import itertools
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
 
 
 def plot_confusion_matrix(cm, classes, file_name,
@@ -133,6 +136,25 @@ def predict(classes_metadata, row):
     return best_label
 
 
+def print_confusion_matrix(conf_mtx):
+    FP = conf_mtx.sum(axis=0) - np.diag(conf_mtx)
+    FN = conf_mtx.sum(axis=1) - np.diag(conf_mtx)
+    TP = np.diag(conf_mtx)
+    TN = conf_mtx.sum() - (FP + FN + TP)
+
+    # Recall
+    TPR = (TP / (TP + FN))
+
+    # Precision
+    PPV = TP / (TP + FP)
+
+    # Accuracy
+    Accuracy = (TP + TN) / (TP + FN + FP + TN)
+    print('Recalls: %.3f%%' % ((TPR[0]) * 100))
+    print('Precisions: %.3f%%' % ((PPV[0]) * 100))
+    print('Accuracy: %.3f%%' % ((Accuracy[0]) * 100))
+
+
 def naive_bayse(filename):
     dataset = load_csv(filename)
     classes_metadata = preprocess_data(dataset)
@@ -182,21 +204,48 @@ def naive_bayse(filename):
         Accuracy = (TP + TN) / (TP + FN + FP + TN)
         accuracies.append((Accuracy[0]) * 100)
 
-    print('Mean Recalls: %.3f%%' % (sum(recalls) / float(len(recalls))))
-    print('Mean Precisions: %.3f%%' % (sum(precisions) / float(len(precisions))))
-    print('Mean Accuracy: %.3f%%' % (sum(accuracies) / float(len(accuracies))))
+    print('Recalls: %.3f%%' % (sum(recalls) / float(len(recalls))))
+    print('Precisions: %.3f%%' % (sum(precisions) / float(len(precisions))))
+    print('Accuracy: %.3f%%' % (sum(accuracies) / float(len(accuracies))))
 
 
-
-def optimal_bayes(filename):
+def optimal_bayes_sklearn(filename):
     data = pd.read_csv(filename)
-    X = data[['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']]
-    y = data['target']
-    
+    # data.head(n = 5)
+    X = data[['mean_radius', 'mean_texture', 'mean_perimeter', 'mean_area', 'mean_smoothness']]
+    y = data['diagnosis']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=8)
+    clf = GaussianNB()
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    confusion_mtx = confusion_matrix(y_test, y_pred)
+    class_names = ['Has Cancer', 'Do not have cancer']
+    plot_confusion_matrix(confusion_mtx, class_names, "sklearn_optimal_bayes_confusion_matrix.png")
+    print_confusion_matrix(confusion_mtx)
+
+
+def naive_bayes_sklearn(filename):
+    data = pd.read_csv(filename)
+    # data.head(n = 5)
+    X = data[['mean_radius', 'mean_texture', 'mean_perimeter', 'mean_area', 'mean_smoothness']]
+    y = data['diagnosis']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=8)
+    clf = GaussianNB()
+    clf.partial_fit(X_train, y_train, np.unique(y_train))
+    y_pred = clf.predict(X_test)
+    confusion_mtx = confusion_matrix(y_test, y_pred)
+    class_names = ['Has Cancer', 'Do not have cancer']
+    plot_confusion_matrix(confusion_mtx, class_names, "sklearn_naive_bayes_confusion_matrix.png")
+    print_confusion_matrix(confusion_mtx)
+
 
 seed(1)
 filename = 'Breast_cancer_data.csv'
-optimal_bayes(filename)
-# naive_bayse()
+print("======= optimal_bayes_sklearn ============")
+optimal_bayes_sklearn(filename)
+print("======= naive_bayes_sklearn ============")
+naive_bayes_sklearn(filename)
+print("======= naive_bayse ============")
+naive_bayse(filename)
 
 
